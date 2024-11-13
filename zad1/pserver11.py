@@ -1,36 +1,57 @@
 import socket
-import sys
+import io
 import struct
+import argparse
 
-HOST = '127.0.0.1'
-BUFSIZE = 1 << 16
+BUFFER = 1 << 16
 
-if len(sys.argv) < 2:
-  print("no port, using 8000")
-  port=8000
-else:
-  port = int( sys.argv[1] )
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", "--address", dest='host', help="IP address of host, default localhost", default="127.0.0.1")
+    parser.add_argument("-p", "--port", dest='port', type=int, help="port number, default 8000", default=8000)
+    
+    return parser.parse_args()
 
-print("Will listen on ", HOST, ":", port)
+def generate_data(size: int) -> bytes:
+    if size < 2:
+        raise ValueError('parameter: size >= 2')
+
+    binary_stream = io.BytesIO()
+    packed = struct.pack('!H', size)
+
+    binary_stream.write(packed)
+    for i in range(size - 2):  # 2 bytes taken by size
+        shift = i % 26
+        character = chr(ord('A') + shift)
+        binary_stream.write(character.encode('ascii'))
+    binary_stream.seek(0)
+    return binary_stream.read()
 
 
-with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-  s.bind((HOST, port))
-  i=1
-  while True:
-    data, address = s.recvfrom( BUFSIZE )
+def validate_data(data: bytes):
+    pass
 
-    number = struct.unpack('!H', data[0:2])
-    print(f'{number=}, {len(data)=} {data[-5:]}')
 
-    if not data:
-      print("Error in datagram?")  
-      break
+if __name__ == '__main__':
 
-    response = f'datagram #{i}'.encode('ascii')
+    args = get_args()
 
-    s.sendto(response, address)
-    print('sending dgram #', i)
-    i+=1
+    print("Will listen on ", args.host, ":", args.port)
+
+
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        s.bind((args.host, args.port))
+        i=1
+        while True:
+            data, address = s.recvfrom(BUFFER)
+
+            number = struct.unpack('!H', data[0:2])
+            print(f'{number=}, {len(data)=} {data[-5:]}')
+
+            response = f'dgram_#{i}'.encode('ascii')
+
+            s.sendto(response, address)
+            print(f'sending: {response}')
+            i+=1
 
 

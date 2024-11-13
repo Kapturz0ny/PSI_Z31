@@ -1,25 +1,25 @@
 import socket
-import sys
 import io
 import struct
+import argparse
 
-HOST = '127.0.0.1'
+BUFFER = 1024
 
-if  len(sys.argv) < 2:  
-    print("no port given, using 8000")
-    port=8000
-else:
-    port = int( sys.argv[1] )
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", "--address", dest='host', help="IP address of host, default localhost", default="127.0.0.1")
+    parser.add_argument("-p", "--port", dest='port', type=int, help="port number, default 8000", default=8000)
+    parser.add_argument("sizes", nargs="+", type=int, help="what sizes of datagrams will be transmitted")
+    
+    return parser.parse_args()
 
-print("Will send to ", HOST, ":", port)
 
-sizes = [2, 8, 128, 1024, 4096]
 
 def generate_data(size: int) -> bytes:
     if size < 2:
-        raise ValueError('argument <size> ')
-    binary_stream = io.BytesIO()
+        raise ValueError('parameter: size >= 2')
 
+    binary_stream = io.BytesIO()
     packed = struct.pack('!H', size)
 
     binary_stream.write(packed)
@@ -30,11 +30,17 @@ def generate_data(size: int) -> bytes:
     binary_stream.seek(0)
     return binary_stream.read()
 
-with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-    for size in sizes:
-        data = generate_data(size)
-        print(f'{len(data)=}, {data[0:2]=}, {size}')
-        s.sendto(data, (HOST, port))
 
-        response, address = s.recvfrom(1024)
-        print(f'{response=}')
+if __name__ == '__main__':
+
+    args = get_args()
+    
+    print("Will send to ", args.host, ":", args.port)
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        for size in args.sizes:
+            data = generate_data(size)
+            print(f'{len(data)=}, {data[0:2]=}')
+            s.sendto(data, (args.host, args.port))
+
+            response, address = s.recvfrom(BUFFER)
+            print(f'{response=}')
