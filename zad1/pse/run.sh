@@ -1,0 +1,1 @@
+docker run --rm --network z31_network --name ps11 -it ps11:latest $@
