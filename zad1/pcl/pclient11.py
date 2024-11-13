@@ -4,6 +4,8 @@ import struct
 import argparse
 
 BUFFER = 1024
+HOST = 'ps11'
+PORT = 8000
 
 
 def get_args():
@@ -13,7 +15,7 @@ def get_args():
         "--address",
         dest="host",
         help="IP address of host, default localhost",
-        default="127.0.0.1",
+        default=HOST,
     )
     parser.add_argument(
         "-p",
@@ -21,10 +23,14 @@ def get_args():
         dest="port",
         type=int,
         help="port number, default 8000",
-        default=8000,
+        default=PORT,
     )
     parser.add_argument(
-        "sizes", nargs="+", type=int, help="what sizes of datagrams will be transmitted"
+        "sizes",
+        nargs="*",
+        type=int,
+        help="what sizes of datagrams will be transmitted",
+        default=[10]
     )
 
     return parser.parse_args()

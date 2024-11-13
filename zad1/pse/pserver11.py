@@ -3,6 +3,8 @@ import struct
 import argparse
 
 BUFFER = 1 << 16
+HOST = '0.0.0.0'
+PORT = 8000
 
 
 def get_args():
@@ -12,7 +14,7 @@ def get_args():
         "--address",
         dest="host",
         help="IP address of host, default localhost",
-        default="127.0.0.1",
+        default=HOST,
     )
     parser.add_argument(
         "-p",
@@ -20,7 +22,7 @@ def get_args():
         dest="port",
         type=int,
         help="port number, default 8000",
-        default=8000,
+        default=PORT,
     )
 
     return parser.parse_args()
