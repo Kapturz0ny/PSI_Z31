@@ -1,0 +1,3 @@
+FROM gcc:4.9
+COPY ./cclient.c ./
+RUN gcc -o cclient cclient.c
