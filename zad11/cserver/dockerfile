@@ -1,0 +1,3 @@
+FROM gcc:4.9
+COPY ./cserver.c ./
+RUN gcc -o cserver cserver.c

@@ -1,0 +1,45 @@
+version: '3.8'
+
+networks:
+  default:
+    name: z31_network
+    external: true
+
+services:
+  z31_pserver:
+    container_name: z31_pserver
+    build: ./pserver/
+    command: python -u ./pserver11.py -a 0.0.0.0 -p 8000
+
+  z31_cserver:
+    container_name: z31_cserver
+    build: ./cserver/
+    command: ./cserver 8001
+
+  z31_pclient_pserver:
+    container_name: z31_pclient_pserver
+    build: ./pclient/
+    command: python -u ./pclient11.py -a z31_pserver -p 8000
+    depends_on:
+      - z31_pserver
+
+  z31_pclient_cserver:
+    container_name: z31_pclient_cserver
+    build: ./pclient/
+    command: python -u ./pclient11.py -a z31_cserver 8001
+    depends_on:
+      - z31_cserver
+
+  z31_cclient_pserver:
+    container_name: z31_cclient_pserver
+    build: ./cclient/
+    command: ./cclient z31_pserver 8000
+    depends_on:
+      - z31_pserver
+
+  z31_cclient_cserver:
+    container_name: z31_cclient_cserver
+    build: ./cclient/
+    command: ./cclient z31_cserver 8001
+    depends_on:
+      - z31_cserver
