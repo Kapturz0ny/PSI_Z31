@@ -26,7 +26,7 @@ services:
   z31_pclient_cserver:
     container_name: z31_pclient_cserver
     build: ./pclient/
-    command: python -u ./pclient11.py -a z31_cserver 8001
+    command: python -u ./pclient11.py -a z31_cserver -p 8001
     depends_on:
       - z31_cserver
 
