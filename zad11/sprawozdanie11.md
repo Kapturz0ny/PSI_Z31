@@ -34,19 +34,15 @@ Serwer czeka w pętli na komunikat, sprawdza czy jego rozmiar zgadza się z rozm
 - n-2 bajty - kolejne litery A-Z, powtarzające się
 
 ### Struktura datagramu serwera:
-SSS_dgram_#\<i\>
-- SSS - kod weryfikacji otrzymanego datagramu
-    - COR dla poprawnego
-    - ERR dla błędnego
-- i - numer wysłanego datagramu przez serwer
+- b'CORRECT datagram' - jeśli otrzymano poprawny datagram
+- b'INCORRECT datagram' - wpp.
 
 
 ### Przykładowa komunikacja z perspektywy serwera:
 1. received: 0x0 0x4 A B
-2. sent: C O R _ d g r a m _ # _ 0x1
+2. sent: CORRECT datagram
 3. received: 0x0 0x8 A B C
-4. sent: E R R _ d g r a m _ # _ 0x2
-
+4. sent: INCORRECT datagram
 
 ## Opis konfiguracji testowej
 
@@ -88,63 +84,64 @@ Oraz
 Klient: Python, Server: Python
 
 ```
-tkurzela@bigubu:~/PSI_Z31/zad11$ docker compose up --remove-orphans z31_pclient_pserver
+tkurzela@bigubu:~/PSI_Z31/zad11$ docker compose up z31_pclient_pserver
 (...)
 Attaching to z31_pclient_pserver, z31_pserver
 z31_pclient_pserver  | Python client for zadanie 1.1
 z31_pclient_pserver  | Will send to  z31_pserver : 8000
 z31_pclient_pserver  | sending dgram of size=100
 z31_pserver          | received good datagram of size=100
-z31_pserver          | sending: b'COR_dgram_#5'
-z31_pclient_pserver  | response=b'COR_dgram_#5'
+z31_pserver          | sending: b'CORRECT datagram'
+z31_pclient_pserver  | response=b'CORRECT datagram'
 z31_pclient_pserver  | sending dgram of size=200
 z31_pserver          | received good datagram of size=200
-z31_pserver          | sending: b'COR_dgram_#6'
-z31_pclient_pserver  | response=b'COR_dgram_#6'
+z31_pserver          | sending: b'CORRECT datagram'
+z31_pclient_pserver  | response=b'CORRECT datagram'
 z31_pclient_pserver  | sending dgram of size=500
 z31_pserver          | received good datagram of size=500
-z31_pserver          | sending: b'COR_dgram_#7'
-z31_pclient_pserver  | response=b'COR_dgram_#7'
+z31_pserver          | sending: b'CORRECT datagram'
+z31_pclient_pserver  | response=b'CORRECT datagram'
 z31_pclient_pserver  | sending dgram of size=1000
 z31_pserver          | received good datagram of size=1000
-z31_pserver          | sending: b'COR_dgram_#8'
-z31_pclient_pserver  | response=b'COR_dgram_#8'
+z31_pserver          | sending: b'CORRECT datagram'
+z31_pclient_pserver  | response=b'CORRECT datagram'
+
 ```
 
 Klient: C, Server: Python
 
 ```
-tkurzela@bigubu:~/PSI_Z31/zad11$ docker compose up --remove-orphans z31_cclient_pserver
+tkurzela@bigubu:~/PSI_Z31/zad11$ docker compose up z31_cclient_pserver
 (...)
 Attaching to z31_cclient_pserver, z31_pserver
 z31_pserver          | received good datagram of size=100
-z31_pserver          | sending: b'COR_dgram_#9'
+z31_pserver          | sending: b'CORRECT datagram'
 z31_pserver          | received good datagram of size=200
-z31_pserver          | sending: b'COR_dgram_#10'
+z31_pserver          | sending: b'CORRECT datagram'
 z31_pserver          | received good datagram of size=500
-z31_pserver          | sending: b'COR_dgram_#11'
+z31_pserver          | sending: b'CORRECT datagram'
 z31_pserver          | received good datagram of size=1000
-z31_pserver          | sending: b'COR_dgram_#12'
+z31_pserver          | sending: b'CORRECT datagram'
 z31_pserver          | received good datagram of size=2000
-z31_pserver          | sending: b'COR_dgram_#13'
+z31_pserver          | sending: b'CORRECT datagram'
 z31_pserver          | received good datagram of size=65507
-z31_pserver          | sending: b'COR_dgram_#14'
-z31_cclient_pserver  | sending datagram message: Message too long
+z31_pserver          | sending: b'CORRECT datagram'
 z31_cclient_pserver  | C client for zadanie 1.1
 z31_cclient_pserver  | Will send to z31_pserver:8000
 z31_cclient_pserver  | Sending datagram #1, size: 100
-z31_cclient_pserver  | Server response: COR_dgram_#9
+z31_cclient_pserver  | Server response: CORRECT datagram
 z31_cclient_pserver  | Sending datagram #2, size: 200
-z31_cclient_pserver  | Server response: COR_dgram_#10
+z31_cclient_pserver  | Server response: CORRECT datagram
 z31_cclient_pserver  | Sending datagram #3, size: 500
-z31_cclient_pserver  | Server response: COR_dgram_#11
+z31_cclient_pserver  | Server response: CORRECT datagram
 z31_cclient_pserver  | Sending datagram #4, size: 1000
-z31_cclient_pserver  | Server response: COR_dgram_#12
+z31_cclient_pserver  | Server response: CORRECT datagram
 z31_cclient_pserver  | Sending datagram #5, size: 2000
-z31_cclient_pserver  | Server response: COR_dgram_#13
+z31_cclient_pserver  | Server response: CORRECT datagram
 z31_cclient_pserver  | Sending datagram #6, size: 65507
-z31_cclient_pserver  | Server response: COR_dgram_#14
+z31_cclient_pserver  | Server response: CORRECT datagram
 z31_cclient_pserver  | Sending datagram #7, size: 65508
+z31_cclient_pserver  | sending datagram message: Message too long
 ```
 
 Klient: C, Server: C
@@ -203,51 +200,55 @@ z31_pclient_cserver  | response=b'CORRECT datagram\n'
 
 ### Sprawdzenie maksymalnego rozmiaru datagramu
 
-Wiadomo, że datagram UDP musi się zmieścić w jednej ramce IP. Jej rozmiar to 64 KiB.
-Do tego nagłówek IPv4 ma 20 B (standardowo, bez dodatkowych opcji) a nagłówek UDP ma 8 B.
-Razem to daje, że maksymalny rozmiar danych w datagramie UDP to 65535-28=**65507** B, co zgadza się z obserwacją:
+Datagram UDP musi się zmieścić w jednej ramce IP, której maksymalny rozmiar to 65535 bajtów. Nagłówek IPv4 mieści się na 20 bajtach (standardowo, bez dodatkowych opcji), a nagłówek UDP zajmuje 8 bajtów. Po odliczeniu nagłówków (65535-20-8=65507) na dane zostaje maksymalnie 65507B, co zgadza się z poniższą obserwacją:
+
 ```
-tkurzela@bigubu:~/PSI_Z31/zad11$ docker compose up --remove-orphans z31_test_size
-(...)
+tkurzela@bigubu:~/PSI_Z31/zad11$ docker compose up z31_test_size
+[+] Running 2/0
+ ✔ Container z31_pserver               Created                                                                                                                                           0.0s 
+ ✔ Container z31_pclient_pserver_test  Created                                                                                                                                           0.0s 
 Attaching to z31_pclient_pserver_test, z31_pserver
+z31_pserver               | Python server for zadanie 1.1
+z31_pserver               | Will listen on  0.0.0.0 : 8000
 z31_pclient_pserver_test  | Python client for zadanie 1.1
 z31_pclient_pserver_test  | Will send to  z31_pserver : 8000
 z31_pclient_pserver_test  | sending dgram of size=65500
 z31_pserver               | received good datagram of size=65500
-z31_pserver               | sending: b'COR_dgram_#15'
-z31_pclient_pserver_test  | response=b'COR_dgram_#15'
+z31_pserver               | sending: b'CORRECT datagram'
+z31_pclient_pserver_test  | response=b'CORRECT datagram'
 z31_pclient_pserver_test  | sending dgram of size=65501
 z31_pserver               | received good datagram of size=65501
-z31_pserver               | sending: b'COR_dgram_#16'
-z31_pclient_pserver_test  | response=b'COR_dgram_#16'
+z31_pserver               | sending: b'CORRECT datagram'
+z31_pclient_pserver_test  | response=b'CORRECT datagram'
 z31_pclient_pserver_test  | sending dgram of size=65502
 z31_pserver               | received good datagram of size=65502
-z31_pserver               | sending: b'COR_dgram_#17'
-z31_pclient_pserver_test  | response=b'COR_dgram_#17'
+z31_pserver               | sending: b'CORRECT datagram'
+z31_pclient_pserver_test  | response=b'CORRECT datagram'
 z31_pclient_pserver_test  | sending dgram of size=65503
 z31_pserver               | received good datagram of size=65503
-z31_pserver               | sending: b'COR_dgram_#18'
-z31_pclient_pserver_test  | response=b'COR_dgram_#18'
+z31_pserver               | sending: b'CORRECT datagram'
+z31_pclient_pserver_test  | response=b'CORRECT datagram'
 z31_pclient_pserver_test  | sending dgram of size=65504
 z31_pserver               | received good datagram of size=65504
-z31_pserver               | sending: b'COR_dgram_#19'
-z31_pclient_pserver_test  | response=b'COR_dgram_#19'
+z31_pserver               | sending: b'CORRECT datagram'
+z31_pclient_pserver_test  | response=b'CORRECT datagram'
 z31_pclient_pserver_test  | sending dgram of size=65505
 z31_pserver               | received good datagram of size=65505
-z31_pserver               | sending: b'COR_dgram_#20'
-z31_pclient_pserver_test  | response=b'COR_dgram_#20'
+z31_pserver               | sending: b'CORRECT datagram'
+z31_pclient_pserver_test  | response=b'CORRECT datagram'
 z31_pclient_pserver_test  | sending dgram of size=65506
 z31_pserver               | received good datagram of size=65506
-z31_pserver               | sending: b'COR_dgram_#21'
-z31_pclient_pserver_test  | response=b'COR_dgram_#21'
+z31_pserver               | sending: b'CORRECT datagram'
+z31_pclient_pserver_test  | response=b'CORRECT datagram'
 z31_pclient_pserver_test  | sending dgram of size=65507
 z31_pserver               | received good datagram of size=65507
-z31_pserver               | sending: b'COR_dgram_#22'
-z31_pclient_pserver_test  | response=b'COR_dgram_#22'
+z31_pserver               | sending: b'CORRECT datagram'
+z31_pclient_pserver_test  | response=b'CORRECT datagram'
 z31_pclient_pserver_test  | sending dgram of size=65508
 z31_pclient_pserver_test  | [Errno 90] Message too long
 z31_pclient_pserver_test  | Could not send dgram of size=65508
 z31_pclient_pserver_test  | Max possible size is 65507
+
 ```
 
 # Wnioski
