@@ -9,6 +9,7 @@
 #include <unistd.h>
 
 #define BUFSIZE 1 << 16
+#define RESPONSIZE 64
 
 struct arguments {
     struct hostent *host_address;
@@ -78,6 +79,7 @@ int main(int argc, char *argv[]) {
         exit(2);
     }
 
+    int i = 0;
     while (1) {
             int bytes_read = recvfrom(sfd, buffer, BUFSIZE, 0, (struct sockaddr *)&client_address,
                                     &client_address_length);
@@ -92,9 +94,11 @@ int main(int argc, char *argv[]) {
                 }
                 const char *response = NULL; // Stały wskaźnik na łańcuch znaków
                 if (decoded_size == bytes_read) {
-                    response = "CORRECT datagram\n";
+                    // response = "CORRECT datagram\n";
+                    sprintf(response, "COR_dgram_#_%d", i);
                 } else {
-                    response = "INCORRECT datagram\n";
+                    // response = "INCORRECT datagram\n";
+                    sprintf(response, "ERR_dgram_#_%d", i);
                 }
 
                 // Wysłanie odpowiedzi do klienta
@@ -106,6 +110,7 @@ int main(int argc, char *argv[]) {
                 }
                 fflush(stdout);
             }
+            i = 0;
     }
 
     close(sfd);
