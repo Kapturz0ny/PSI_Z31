@@ -204,45 +204,17 @@ Datagram UDP musi się zmieścić w jednej ramce IP, której maksymalny rozmiar 
 
 ```
 tkurzela@bigubu:~/PSI_Z31/zad11$ docker compose up z31_test_size
-[+] Running 2/0
- ✔ Container z31_pserver               Created                                                                                                                                           0.0s 
- ✔ Container z31_pclient_pserver_test  Created                                                                                                                                           0.0s 
+(...)
 Attaching to z31_pclient_pserver_test, z31_pserver
 z31_pserver               | Python server for zadanie 1.1
 z31_pserver               | Will listen on  0.0.0.0 : 8000
 z31_pclient_pserver_test  | Python client for zadanie 1.1
 z31_pclient_pserver_test  | Will send to  z31_pserver : 8000
 z31_pclient_pserver_test  | sending dgram of size=65500
-z31_pserver               | received good datagram of size=65500
-z31_pserver               | sending: b'CORRECT datagram'
 z31_pclient_pserver_test  | response=b'CORRECT datagram'
-z31_pclient_pserver_test  | sending dgram of size=65501
-z31_pserver               | received good datagram of size=65501
-z31_pserver               | sending: b'CORRECT datagram'
-z31_pclient_pserver_test  | response=b'CORRECT datagram'
-z31_pclient_pserver_test  | sending dgram of size=65502
-z31_pserver               | received good datagram of size=65502
-z31_pserver               | sending: b'CORRECT datagram'
-z31_pclient_pserver_test  | response=b'CORRECT datagram'
-z31_pclient_pserver_test  | sending dgram of size=65503
-z31_pserver               | received good datagram of size=65503
-z31_pserver               | sending: b'CORRECT datagram'
-z31_pclient_pserver_test  | response=b'CORRECT datagram'
-z31_pclient_pserver_test  | sending dgram of size=65504
-z31_pserver               | received good datagram of size=65504
-z31_pserver               | sending: b'CORRECT datagram'
-z31_pclient_pserver_test  | response=b'CORRECT datagram'
-z31_pclient_pserver_test  | sending dgram of size=65505
-z31_pserver               | received good datagram of size=65505
-z31_pserver               | sending: b'CORRECT datagram'
-z31_pclient_pserver_test  | response=b'CORRECT datagram'
-z31_pclient_pserver_test  | sending dgram of size=65506
-z31_pserver               | received good datagram of size=65506
-z31_pserver               | sending: b'CORRECT datagram'
-z31_pclient_pserver_test  | response=b'CORRECT datagram'
+(...)
+(usunięto komunikaty serwera)
 z31_pclient_pserver_test  | sending dgram of size=65507
-z31_pserver               | received good datagram of size=65507
-z31_pserver               | sending: b'CORRECT datagram'
 z31_pclient_pserver_test  | response=b'CORRECT datagram'
 z31_pclient_pserver_test  | sending dgram of size=65508
 z31_pclient_pserver_test  | [Errno 90] Message too long
