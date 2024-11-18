@@ -32,6 +32,12 @@ def get_args():
         help="what sizes of datagrams will be transmitted",
         default=[100, 200, 500, 1000]
     )
+    parser.add_argument(
+        "-t",
+        "--test-mode",
+        dest="test_mode",
+        action="store_true"
+    )
 
     return parser.parse_args()
 
@@ -56,14 +62,26 @@ if __name__ == "__main__":
 
     args = get_args()
 
+    if args.test_mode:
+        sizes = range(65_500, 65_535)
+    else:
+        sizes = args.sizes
+
     print("Python client for zadanie 1.1")
     print("Will send to ", args.host, ":", args.port)
 
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
-        for size in args.sizes:
+        for size in sizes:
             data = generate_data(size)
             print(f"sending dgram of {size=}")
-            s.sendto(data, (args.host, args.port))
+
+            try:
+                s.sendto(data, (args.host, args.port))
+            except OSError as err:
+                print(err)
+                print(f'Could not send dgram of {size=}')
+                print(f'Max possible size is {size-1}')
+                break
 
             response, address = s.recvfrom(BUFFER)
             print(f"{response=}")

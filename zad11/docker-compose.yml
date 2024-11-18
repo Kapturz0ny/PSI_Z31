@@ -43,3 +43,10 @@ services:
     command: ./cclient z31_cserver 8001
     depends_on:
       - z31_cserver
+
+  z31_test_size:
+    container_name: z31_pclient_pserver
+    build: ./pclient/
+    command: python -u ./pclient11.py -a z31_pserver -p 8000 -t
+    depends_on:
+      - z31_pserver
