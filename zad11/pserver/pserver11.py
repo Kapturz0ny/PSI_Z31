@@ -55,18 +55,18 @@ if __name__ == "__main__":
 
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.bind((args.host, args.port))
-        i = 1
         while True:
             data, address = s.recvfrom(BUFFER)
 
             size = len(data)
             number = struct.unpack("!H", data[0:2])[0]
 
-            check = validate_data(data)
+            if validate_data(data):
+                text = "CORRECT datagram"
+            else:
+                text = "INCORRECT datagram"
 
-            check_text = "COR" if check else "ERR"
-            response = f"{check_text}_dgram_#{i}".encode("ascii")
+            response = text.encode("ascii")
 
             s.sendto(response, address)
             print(f"sending: {response}")
-            i += 1
