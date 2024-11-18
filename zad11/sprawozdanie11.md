@@ -65,11 +65,16 @@ Porty: 8000 dla serwera Python, 8001 dla serwera C
 `docker compose up --build` buduje, a następnie uruchamia wszystkie kontenery
 
 **Zalecane** jest jednak wcześniejsze zbudowanie wszystkich kontenerów poleceniem `docker compose build`
+
 Następnie można uruchomić wybraną komunikację:
 - `docker compose up z31_pserver_pclient` serwer Python, klient Python
+
 - `docker compose up z31_pserver_cclient` serwer Python, klient C
+
 - `docker compose up z31_cserver_pclient` serwer C, klient Python
+
 - `docker compose up z31_cserver_cclient` serwer C, klient C
+
 - `docker compose up z31_pserver_pclient_test` serwer Python, klient Python w konfiguracji testowej
 (sprawdzenie maksymalnego rozmiaru datagramu)
 
@@ -249,4 +254,4 @@ z31_pclient_pserver_test  | Max possible size is 65507
 
 UDP to bardzo prosty protokół warstwy transportowej. Łatwo można napisać prosty program który z niego korzysta. Jednak ta prostota wiąże się z brakiem gwarancji poprawnego przesyłu danych - sprawdzanie poprawności trzeba implementować w programie. Dodatkowo jeśli urządzenie docelowe nie jest dostępne w trakcie nadawania, komunikat przepada bez informacji zwrotnej o niepowodzeniu - jeśli potwierdzenie odbioru jest kluczowe, należy je dodać programowo.
 
-W faktycznych aplikacjach UDP powinien być używany tylko kiedy narzut TCP jest problematyczny - np. w przesyle wideo na żywo, rozmowy głosowej czy gry on-line.
+W faktycznych aplikacjach UDP powinien być używany tylko kiedy narzut TCP jest problematyczny i nie dbamy o utratę pojedynczych pakietów - np. w przesyle wideo na żywo, rozmowy głosowej czy gry on-line.
