@@ -1,0 +1,25 @@
+version: '3.8'
+
+networks:
+  default:
+    name: z31_network
+    external: true
+
+services:
+  z31_server:
+    container_name: z31_server
+    build: ./server/
+    cap_add:
+      - NET_ADMIN
+    command: python -u ./server12.py -a 0.0.0.0 -p 8000
+
+  z31_client:
+    container_name: z31_client
+    build: ./client/
+    depends_on:
+      - z31_server
+    cap_add:
+    - NET_ADMIN
+    command: >
+      sh -c "tc qdisc add dev eth0 root netem delay 1000ms 500ms loss 50% &&
+             python -u ./client12.py -a z31_server -p 8000 -n 10"
