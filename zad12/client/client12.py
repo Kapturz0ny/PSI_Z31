@@ -68,7 +68,7 @@ if __name__ == "__main__":
     sequence_number = 1
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.settimeout(TIMEOUT)
-        while sequence_number <= args.number:
+        while sequence_number <= int(args.number):
             data = generate_data(DGRAM_SIZE, sequence_number)
             print(
                 f"Sending #{sequence_number} datagram with size = {DGRAM_SIZE}")
