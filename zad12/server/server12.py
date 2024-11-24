@@ -33,16 +33,18 @@ def validate_data(data: bytes) -> bool:
     if size < 3:
         print("ERROR: datagram too small")
         return False
-    number = struct.unpack("!H", data[0:2])[0]
+    received_size = struct.unpack("!H", data[0:2])[0]
+    received_number = int.from_bytes(data[2:3])
 
-    if size != number:
+    if size != received_size:
         print(
-            f"ERROR: mismatch between supposed size ({number}) \
+            f"ERROR: mismatch between supposed size ({received_size}) \
             and size of received datagram ({size})"
         )
         return False
 
-    print(f"received good datagram of {size=}")
+    print(
+        f"received good datagram of {size = } and sequence number = {received_number}")
     return True
 
 
@@ -58,7 +60,6 @@ if __name__ == "__main__":
         while True:
             data, address = s.recvfrom(BUFFER)
 
-            size = len(data)
             number = struct.unpack("!B", data[2:3])[0]
 
             if validate_data(data):

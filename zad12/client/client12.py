@@ -64,10 +64,10 @@ if __name__ == "__main__":
 
     print("Client for zadanie 1.2")
     print("Will send to ", args.host, ":", args.port)
-
+    i = 0
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.settimeout(TIMEOUT)
-        for i in range(int(args.number)):
+        while i < args.number:
             data = generate_data(DGRAM_SIZE, i)
             print(f"sending #{i} dgram of {DGRAM_SIZE=}")
 
@@ -81,8 +81,11 @@ if __name__ == "__main__":
 
             try:
                 response, address = s.recvfrom(BUFFER)
+                # success
                 print(f"{response=}")
+                i += 1
             except socket.timeout:
-                print(f"Timeout waiting for response for dgram #{i}")
+                print(
+                    f"Timeout waiting for response for dgram #{i}. Dgram will be resent...")
             except OSError as err:
                 print(f"Error receiving response for dgram #{i}: {err}")
