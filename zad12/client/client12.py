@@ -3,7 +3,7 @@ import io
 import struct
 import argparse
 
-BUFFER = 1024
+BUFF_SIZE = 1024
 HOST = 'localhost'
 PORT = 8000
 DGRAM_SIZE = 512
@@ -64,28 +64,31 @@ if __name__ == "__main__":
 
     print("Client for zadanie 1.2")
     print("Will send to ", args.host, ":", args.port)
-    i = 0
+
+    sequence_number = 1
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.settimeout(TIMEOUT)
-        while i < args.number:
-            data = generate_data(DGRAM_SIZE, i)
-            print(f"sending #{i} dgram of {DGRAM_SIZE=}")
-
+        while sequence_number <= args.number:
+            data = generate_data(DGRAM_SIZE, sequence_number)
+            print(
+                f"Sending #{sequence_number} datagram with size = {DGRAM_SIZE}")
             try:
                 s.sendto(data, (args.host, args.port))
+
             except OSError as err:
                 print(err)
-                print(f'Could not send dgram of {DGRAM_SIZE=}')
+                print(f'Could not send datagram of size {DGRAM_SIZE}')
                 print(f'Max possible size is {DGRAM_SIZE-1}')
                 break
 
             try:
-                response, address = s.recvfrom(BUFFER)
-                # success
-                print(f"{response=}")
-                i += 1
+                response, address = s.recvfrom(BUFF_SIZE)
+                received_number = int(response.decode("ascii").split("#")[-1])
+                if received_number == sequence_number:
+                    sequence_number += 1
             except socket.timeout:
                 print(
-                    f"Timeout waiting for response for dgram #{i}. Dgram will be resent...")
+                    f"Timeout waiting for ACK for datagram #{sequence_number}. Datagram will be resent...")
             except OSError as err:
-                print(f"Error receiving response for dgram #{i}: {err}")
+                print(
+                    f"Error receiving ACK for datagram #{sequence_number}: {err}")

@@ -2,7 +2,7 @@ import socket
 import struct
 import argparse
 
-BUFFER = 1 << 16
+BUFF_SIZE = 2**16
 HOST = '0.0.0.0'
 PORT = 8000
 
@@ -28,24 +28,25 @@ def get_args():
     return parser.parse_args()
 
 
-def validate_data(data: bytes) -> bool:
+def is_corrupted(data: bytes) -> bool:
+
     size = len(data)
     if size < 3:
         print("ERROR: datagram too small")
         return False
-    received_size = struct.unpack("!H", data[0:2])[0]
-    received_number = int.from_bytes(data[2:3])
 
-    if size != received_size:
-        print(
-            f"ERROR: mismatch between supposed size ({received_size}) \
-            and size of received datagram ({size})"
-        )
-        return False
+    declared_size = struct.unpack("!H", data[0:2])[0]
+    if size != declared_size:
+        # print(
+        #     f"ERROR: mismatch between supposed size ({declared_size}) \
+        #     and size of received datagram ({size})"
+        # )
+        return True
 
-    print(
-        f"received good datagram of {size = } and sequence number = {received_number}")
-    return True
+    declared_number = int.from_bytes(data[2:3])
+    # print(
+    #     f"received good datagram of {size = } and sequence number = {declared_number}")
+    return False
 
 
 if __name__ == "__main__":
@@ -54,20 +55,27 @@ if __name__ == "__main__":
 
     print("Server for zadanie 1.2")
     print("Will listen on ", args.host, ":", args.port)
+    awaited_number = 1
 
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.bind((args.host, args.port))
+
         while True:
-            data, address = s.recvfrom(BUFFER)
+            data, address = s.recvfrom(BUFF_SIZE)
 
-            number = struct.unpack("!B", data[2:3])[0]
+            received_number = int.from_bytes(data[2:3])
 
-            if validate_data(data):
-                text = f"CORRECT datagram #{number}"
+            if is_corrupted(data):
+                print("Datagram corrupted.")
+                pass
+            if received_number == awaited_number:
+                print(f"Received datagram  # {received_number}")
+                awaited_number += 1
             else:
-                text = f"INCORRECT datagram #{number}"
+                print(
+                    f"Received datagram #{received_number} - datagram may be duplicated or out of order")
+                print(f"Awaiting for datagram #{awaited_number}...")
 
-            response = text.encode("ascii")
-
+            message = f"ACK #{received_number}"
+            response = message.encode("ascii")
             s.sendto(response, address)
-            print(f"sending: {response}")
