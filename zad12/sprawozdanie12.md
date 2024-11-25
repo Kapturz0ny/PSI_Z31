@@ -55,12 +55,12 @@ tc qdisc add dev eth0 root netem delay 1000ms 500ms loss 50%
 # Uruchomienie i testowanie
 
 ## Instrukcja uruchomienia
-`docker compose up` - buduje i uruchamia kontener serwera i kontener klienta
+`docker compose up --build` - buduje i uruchamia kontener serwera i kontener klienta
 
 ## Testowanie
 
 ```
-$ docker compose up
+$ docker compose up --build
 (...)
 z31_server  | Server for zadanie 1.2
 z31_server  | Will listen on  0.0.0.0 : 8000
