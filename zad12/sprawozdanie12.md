@@ -135,3 +135,5 @@ z31_server  | Received datagram  # 10
 Nawet przy bardzo dużych zakłóceniach na łączu komunikacyjnym, prosty algorytm numerowania pakietów i retransmisji przy przekroczeniu limitu czasowego pozwala zapewnić pewną i bezbłędną komunikację przez UDP. Niestety nie ma żadnych mechanizmów korekcyjnych, przez co każda błędna wiadomość musi być retransmitowana.
 
 Każdy datagram wysyłany jest osobno, przy oczekiwaniu na odpowiedź nie są wysyłane kolejne. To spowalnia komunikację. Pewnym rozwiązaniem byłoby zastosowanie przesuwnego okna (używanego np. w TCP).
+
+Co prawda w tym wypadku zakłócenia były symulowane, jednak w rzeczywistości dochodzi do podobnych problemów z komunikacją i zawsze trzeba uwzględniać możliwość przekłamania części danych lub zgubienia całego datagramu. Przy użyciu protokołu UDP mechanizmy kontrolne są konieczne, żeby mieć gwarancję poprawnej komunikacji.
