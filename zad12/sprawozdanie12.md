@@ -23,22 +23,21 @@ Wychodzimy z kodu z zadania 1.1, tym razem pakiety datagramu mają stałą wielk
 # Rozwiązanie
 
 ## Schemat Komunikacji
-DO UZUPEŁNIENIA
+Klient wysyła po kolei datagramy o zadanym rozmiarze i rosnących numerach sekwencyjnych.
+Jeśli nie otrzyma odpowiedzi od serwera o odpowiednim numerze w ustalonym odgórnie czasie (domyślnie 1s), datagram jest wysyłany ponownie aż do skutku.
+
+Serwer czeka w pętli na komunikat, sprawdza czy jego rozmiar zgadza się z rozmiarem przekazanym w komunikacie, po czym przesyła odpowiedź - 
 
 ### Struktura datagramu klienta:
 - 2 bajty - rozmiar całego datagramu (n)
-- n-2 bajty - kolejne litery A-Z, powtarzające się
+- 1 bajt - nr sekwencyjny datagramu
+- n-3 bajty - kolejne litery A-Z, powtarzające się
 
 ### Struktura datagramu serwera:
-- b'CORRECT datagram' - jeśli otrzymano poprawny datagram
-- b'INCORRECT datagram' - wpp.
+- b'ACK #\<number\>' 
+    - \<number\> to najwyższy numer dobrego datagramu, jaki otrzymał serwer
+    - \<number\> to ciąg cyfr dziesiętnych
 
-
-### Przykładowa komunikacja z perspektywy serwera:
-1. received: 0x0 0x4 A B
-2. sent: CORRECT datagram
-3. received: 0x0 0x8 A B C
-4. sent: INCORRECT datagram
 
 ## Opis konfiguracji testowej
 
@@ -48,13 +47,91 @@ Nie deklarujemy adresów IP wprost, korzystamy z nazw kontenerów i resolvera DN
 
 Port: 8000
 
+Symulacja zakłóceń sieciowych: polecenie
+```
+tc qdisc add dev eth0 root netem delay 1000ms 500ms loss 50%
+```
+
 # Uruchomienie i testowanie
 
 ## Instrukcja uruchomienia
-DO UZUPEŁNIENIA
+`docker compose up` - buduje i uruchamia kontener serwera i kontener klienta
 
 ## Testowanie
-DO UZUPEŁNIENIA
+
+```
+$ docker compose up
+(...)
+z31_server  | Server for zadanie 1.2
+z31_server  | Will listen on  0.0.0.0 : 8000
+z31_client  | Client for zadanie 1.2
+z31_client  | Will send to  z31_server : 8000
+z31_client  | Sending #1 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #1. Datagram will be resent...
+z31_client  | Sending #1 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #1. Datagram will be resent...
+z31_client  | Sending #1 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #1. Datagram will be resent...
+z31_client  | Sending #1 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #1. Datagram will be resent...
+z31_client  | Sending #1 datagram with size = 512
+z31_server  | Received datagram  # 1
+z31_client  | Sending #2 datagram with size = 512
+z31_server  | Received datagram  # 2
+z31_client  | Sending #3 datagram with size = 512
+z31_server  | Received datagram #1 - datagram may be duplicated or out of order
+z31_server  | Awaiting for datagram #3...
+z31_client  | Sending #3 datagram with size = 512
+z31_client  | Sending #4 datagram with size = 512
+z31_server  | Received datagram  # 3
+z31_server  | Received datagram #3 - datagram may be duplicated or out of order
+z31_server  | Awaiting for datagram #4...
+z31_client  | Sending #4 datagram with size = 512
+z31_server  | Received datagram  # 4
+z31_client  | Sending #5 datagram with size = 512
+z31_server  | Received datagram #4 - datagram may be duplicated or out of order
+z31_server  | Awaiting for datagram #5...
+z31_client  | Sending #5 datagram with size = 512
+z31_server  | Received datagram  # 5
+z31_client  | Sending #6 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #6. Datagram will be resent...
+z31_client  | Sending #6 datagram with size = 512
+z31_server  | Received datagram  # 6
+z31_client  | Sending #7 datagram with size = 512
+z31_server  | Received datagram #6 - datagram may be duplicated or out of order
+z31_server  | Awaiting for datagram #7...
+z31_client  | Sending #7 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #7. Datagram will be resent...
+z31_client  | Sending #7 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #7. Datagram will be resent...
+z31_client  | Sending #7 datagram with size = 512
+z31_server  | Received datagram  # 7
+z31_client  | Sending #8 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #8. Datagram will be resent...
+z31_client  | Sending #8 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #8. Datagram will be resent...
+z31_client  | Sending #8 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #8. Datagram will be resent...
+z31_client  | Sending #8 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #8. Datagram will be resent...
+z31_client  | Sending #8 datagram with size = 512
+z31_server  | Received datagram  # 8
+z31_client  | Sending #9 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #9. Datagram will be resent...
+z31_client  | Sending #9 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #9. Datagram will be resent...
+z31_client  | Sending #9 datagram with size = 512
+z31_server  | Received datagram  # 9
+z31_client  | Sending #10 datagram with size = 512
+z31_server  | Received datagram #9 - datagram may be duplicated or out of order
+z31_server  | Awaiting for datagram #10...
+z31_client  | Sending #10 datagram with size = 512
+z31_client  | Timeout waiting for ACK for datagram #10. Datagram will be resent...
+z31_client  | Sending #10 datagram with size = 512
+z31_server  | Received datagram  # 10
+```
 
 # Wnioski
-DO UZUPEŁNIENIA
+Nawet przy bardzo dużych zakłóceniach na łączu komunikacyjnym, prosty algorytm numerowania pakietów i retransmisji przy przekroczeniu limitu czasowego pozwala zapewnić pewną i bezbłędną komunikację przez UDP. Niestety nie ma żadnych mechanizmów korekcyjnych, przez co każda błędna wiadomość musi być retransmitowana.
+
+Każdy datagram wysyłany jest osobno, przy oczekiwaniu na odpowiedź nie są wysyłane kolejne. To spowalnia komunikację. Pewnym rozwiązaniem byłoby zastosowanie przesuwnego okna (używanego np. w TCP).
