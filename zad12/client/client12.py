@@ -9,6 +9,7 @@ PORT = 8000
 DGRAM_SIZE = 512
 DGRAM_NUMBER = 10
 TIMEOUT = 1.0
+MAX_SEQ_NUMBER = 256
 
 
 def get_args():
@@ -47,7 +48,7 @@ def generate_data(size: int, number: int) -> bytes:
     packed = struct.pack("!H", size)
     binary_stream.write(packed)
 
-    packed_number = struct.pack("!B", number % 256)
+    packed_number = struct.pack("!B", number % MAX_SEQ_NUMBER)
     binary_stream.write(packed_number)
 
     for i in range(size - 3):  # 2 bytes taken by size, 1 by number

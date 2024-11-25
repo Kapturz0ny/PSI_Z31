@@ -5,6 +5,7 @@ import argparse
 BUFF_SIZE = 2**16
 HOST = '0.0.0.0'
 PORT = 8000
+MAX_SEQ_NUMBER = 256
 
 
 def get_args():
@@ -67,10 +68,9 @@ if __name__ == "__main__":
 
             if is_corrupted(data):
                 print("Datagram corrupted.")
-                pass
-            if received_number == awaited_number:
+            elif received_number == awaited_number:
                 print(f"Received datagram  # {received_number}")
-                awaited_number += 1
+                awaited_number = (awaited_number + 1) % MAX_SEQ_NUMBER
             else:
                 print(
                     f"Received datagram #{received_number} - datagram may be duplicated or out of order")
