@@ -68,7 +68,8 @@ if __name__ == "__main__":
 
             if is_corrupted(data):
                 print("Datagram corrupted.")
-            elif received_number == awaited_number:
+                continue
+            if received_number == awaited_number:
                 print(f"Received datagram  # {received_number}")
                 awaited_number = (awaited_number + 1) % MAX_SEQ_NUMBER
             else:
