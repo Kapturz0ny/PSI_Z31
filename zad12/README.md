@@ -3,24 +3,34 @@
 Realizacja komunikacji protokołem UDP między klientem, a serwerem, zrealizowana w języku Python. Komunikacja uwzględnia możliwość gubienia przesyłanych datagramów. Wprowadzone zakłócenie to 1000ms opóźnienia wysłania datagramu z odchyleniem do 500ms oraz prawdopodobieństwo 50%, że zostanie zgubiony. Wtedy taki zgubiony datagram jest wykrywany i retransmitowany co zapewnia niezawodność transmisji.
 
 ## Schemat Komunikacji
+Klient wysyła po kolei datagramy o zadanym rozmiarze i rosnących numerach sekwencyjnych.
+Jeśli nie otrzyma odpowiedzi od serwera, która potwierdza otrzymanie przez serwer wysłanego datagramu (o tym samym numerze sekwencyjnym) w ustalonym odgórnie czasie (domyślnie 1s), datagram jest wysyłany ponownie aż do skutku.
+
+Serwer czeka w pętli na komunikat, sprawdza czy jego rozmiar zgadza się z rozmiarem przekazanym w komunikacie, po czym przesyła odpowiedź ACK potwierdzającą otrzymanie datagramu wraz z jego numerem sekwencyjnym.
 
 ### Struktura datagramu klienta:
-- rozmiar - 512 bajtów
-- pierwsze 2 bajty - rozmiar całego datagramu (n)
-- trzeci bajt - numer datagramu
+- 2 bajty - rozmiar całego datagramu (n)
+- 1 bajt - nr sekwencyjny datagramu
 - n-3 bajty - kolejne litery A-Z, powtarzające się
+- n = 512 w tym zadaniu
 
 ### Struktura datagramu serwera:
-- b'CORRECT datagram' - jeśli otrzymano poprawny datagram
-- b'INCORRECT datagram' - wpp.
+- b'ACK #\<number\>' 
+    - \<number\> to numer datagramu jaki otrzymał
 
-### Przykładowa komunikacja z perspektywy serwera:
-DO POPRAWIENIA
 
-1. received: 0x0 0x4 A B
-2. sent: CORRECT datagram
-3. received: 0x0 0x8 A B C
-4. sent: INCORRECT datagram
+## Opis konfiguracji testowej
+
+Sieć: docker network o nazwie `z31_network`
+
+Nie deklarujemy adresów IP wprost, korzystamy z nazw kontenerów i resolvera DNS w programach.
+
+Port: 8000
+
+Symulacja zakłóceń sieciowych: polecenie
+```
+tc qdisc add dev eth0 root netem delay 1000ms 500ms loss 50%
+```
 
 
 ## Uruchomienie

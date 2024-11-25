@@ -24,19 +24,19 @@ Wychodzimy z kodu z zadania 1.1, tym razem pakiety datagramu mają stałą wielk
 
 ## Schemat Komunikacji
 Klient wysyła po kolei datagramy o zadanym rozmiarze i rosnących numerach sekwencyjnych.
-Jeśli nie otrzyma odpowiedzi od serwera o odpowiednim numerze w ustalonym odgórnie czasie (domyślnie 1s), datagram jest wysyłany ponownie aż do skutku.
+Jeśli nie otrzyma odpowiedzi od serwera, która potwierdza otrzymanie przez serwer wysłanego datagramu (o tym samym numerze sekwencyjnym) w ustalonym odgórnie czasie (domyślnie 1s), datagram jest wysyłany ponownie aż do skutku.
 
-Serwer czeka w pętli na komunikat, sprawdza czy jego rozmiar zgadza się z rozmiarem przekazanym w komunikacie, po czym przesyła odpowiedź - 
+Serwer czeka w pętli na komunikat, sprawdza czy jego rozmiar zgadza się z rozmiarem przekazanym w komunikacie, po czym przesyła odpowiedź ACK potwierdzającą otrzymanie datagramu wraz z jego numerem sekwencyjnym.
 
 ### Struktura datagramu klienta:
 - 2 bajty - rozmiar całego datagramu (n)
 - 1 bajt - nr sekwencyjny datagramu
 - n-3 bajty - kolejne litery A-Z, powtarzające się
+- n = 512 w tym zadaniu
 
 ### Struktura datagramu serwera:
 - b'ACK #\<number\>' 
-    - \<number\> to najwyższy numer dobrego datagramu, jaki otrzymał serwer
-    - \<number\> to ciąg cyfr dziesiętnych
+    - \<number\> to numer datagramu jaki otrzymał
 
 
 ## Opis konfiguracji testowej
