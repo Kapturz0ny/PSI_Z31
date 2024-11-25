@@ -38,15 +38,9 @@ def is_corrupted(data: bytes) -> bool:
 
     declared_size = struct.unpack("!H", data[0:2])[0]
     if size != declared_size:
-        # print(
-        #     f"ERROR: mismatch between supposed size ({declared_size}) \
-        #     and size of received datagram ({size})"
-        # )
         return True
 
     declared_number = int.from_bytes(data[2:3])
-    # print(
-    #     f"received good datagram of {size = } and sequence number = {declared_number}")
     return False
 
 
