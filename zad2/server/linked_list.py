@@ -31,7 +31,7 @@ class Element:
 class Node:
     def __init__(self, elem: Element, next_node: 'Node' = None):
         self.elem = elem
-        self.next_node = next_node
+        self.next = next_node
 
 
 class LinkedList:
@@ -46,18 +46,28 @@ class LinkedList:
             self.head = node
             self.tail = node
         elif self.head == self.tail:
-            self.head.next_node = node
+            self.head.next = node
             self.tail = node
         else:
-            self.tail.next_node = node
-            self.tail = self.tail.next_node
+            self.tail.next = node
+            self.tail = self.tail.next
         self.size += 1
     
     def print(self):
         node = self.head
         while node is not None:
             print(node.elem)
-            node = node.next_node
+            node = node.next
+    
+    def print_limited(self, left, right):
+        node = self.head
+        i = 0
+        while node is not None:
+            if i <= left or i >= right:
+                print(node.elem)
+            i += 1
+            node = node.next
+
     
 
 

@@ -32,10 +32,10 @@ def main():
                 client_socket.close()
 
             bstream.seek(0)
-            print(f'Received {total_size} bytes of data')
 
             llist = deserialize(bstream)
-            llist.print()
+            llist.print_limited(10, llist.size - 10)
+            print(f'Received {total_size} bytes of data')
             print('Node count: ', llist.size)
 
 

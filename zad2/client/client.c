@@ -107,6 +107,15 @@ char* serializeList(node* head, size_t* size) {
     return buffer;
 }
 
+void printListLimited(node* head, size_t left, size_t right) {
+    size_t i = 0;
+    for (node* trav = head; trav != NULL; trav = trav->next) {
+        if (i <= left || i >= right) {
+            printElement(trav->elem);
+        }
+    }
+}
+
 // -- LINKED LIST -- (end)
 
 
@@ -163,6 +172,7 @@ int main(int argc, char *argv[]) {
     parse_arguments(argc, argv, &arguments);
 
     node* head = createList(nodeCount, minCharLen, maxCharLen);
+    printListLimited(head, 10, nodeCount - 10);
 
     size_t byteSize;
     char * serialized = serializeList(head, &byteSize);
@@ -181,12 +191,6 @@ int main(int argc, char *argv[]) {
         perror("opening socket");
         exit(EXIT_FAILURE);
     }
-
-    // if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
-    //     perror("Invalid address/ Address not supported");
-    //     close(sockfd);
-    //     exit(EXIT_FAILURE);
-    // }
 
     if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
         perror("Connection to the server failed");
