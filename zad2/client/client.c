@@ -87,7 +87,7 @@ char* serializeList(node* head, size_t* size) {
     for (node *trav = head; trav != NULL; trav = trav->next) {
         if (bufferSize < offset + MAX_ELEM_SIZE) {
             bufferSize += bufferSizeStep;
-            buffer = realloc(buffer, bufferSize);
+            buffer = realloc((char*)buffer, bufferSize);
         }
 
         uint32_t net_id = htonl(trav->elem.id);

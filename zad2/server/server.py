@@ -52,7 +52,7 @@ def main():
                         break
                     bstream.write(portion)
                     total_size += len(portion)
-            finally:
+            except KeyboardInterrupt:
                 print(f"Closing connection with {client_address}")
                 client_socket.close()
 
