@@ -46,6 +46,16 @@ Domyślnie klient wysyła listę o rozmiarze 100_000 elementów, przez co na pew
 
 Wyświetlane jest zarówno pierwsze i ostatnie 10 elementów, żeby zachować przejrzystość.
 
+## Uruchomienie
+
+### Jednolinijkowe
+`docker compose up --build` buduje, a następnie uruchamia wszystkie kontenery
+
+**Zalecane** jest jednak wcześniejsze zbudowanie wszystkich kontenerów poleceniem `docker compose build`
+Następnie można uruchomić w oddzielnych terminalach:
+- `docker compose up z31_tcp_server` serwer Python
+- `docker compose up z31_zad2_client` klient C
+
 ## Testowanie
 
 ```
@@ -108,3 +118,8 @@ z31_tcp_server   | Received 3300931 bytes of data
 z31_tcp_server   | Node count:  100000
 z31_zad2_client exited with code 0
 ```
+
+## Wnioski
+Komunikacja protokołem TCP gwarantuje niezawodne dostarczenie danych w odpowiedniej kolejności. Zrealizowana komunikacja pokazała, że TCP pozwala efektywnie przesyłać duże struktury danych, takie jak lista jednokierunkowa, w sposób przewidywalny i bezbłędny.
+
+W porównaniu do zadań realizowanych wcześniej (z użyciem UDP), TCP zapewnia stabilność poprzez utworzenie połączenia wraz z automatyczną retransmisją zgubionych pakietów. Dla UDP taką retransmisję musieliśmy samodzielnie zapewnić. Dzięki swoim mechanizmom TCP jest idealnym wyborem w przypadkach wymagających niezawodności, takich jak transmisja plików, bazy danych czy komunikatory tekstowe.
