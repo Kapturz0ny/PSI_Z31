@@ -1,0 +1,20 @@
+version: '3.8'
+
+networks:
+  default:
+    name: z31_network
+    external: true
+
+services:
+  z31_tcp_server:
+    container_name: z31_tcp_server
+    build: ./server
+    # command: python -u ./pserver11.py -a 0.0.0.0 -p 8000
+    command: python -u ./server.py
+  
+  z31_tcp_client:
+    container_name: z31_zad2_client
+    build: ./client
+    command: ./client z31_tcp_server 8000
+    depends_on:
+      - z31_tcp_server

@@ -2,19 +2,17 @@ import socket
 import struct
 import io
 
-from linked_list import Element, deserialize
+from linked_list import deserialize
 
-# Server configuration
-HOST = '127.0.0.1'  # Listen on localhost
-PORT = 8000        # Port to listen on
+HOST = '0.0.0.0'
+PORT = 8000
 
-def start_server():
+def main():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
         server_socket.bind((HOST, PORT))
         print(f"Server started on {HOST}:{PORT}")
         server_socket.listen()
         print("Waiting for a connection...")
-
 
         while True:
             client_socket, client_address = server_socket.accept()
@@ -42,4 +40,4 @@ def start_server():
 
 
 if __name__ == "__main__":
-    start_server()
+    main()

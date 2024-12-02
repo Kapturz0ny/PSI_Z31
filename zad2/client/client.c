@@ -109,48 +109,84 @@ char* serializeList(node* head, size_t* size) {
 
 // -- LINKED LIST -- (end)
 
-#define SERVER_PORT 8000
-#define SERVER_IP "127.0.0.1"
+
+struct arguments {
+    struct hostent *host_address;
+    u_int16_t port;
+};
+
+
+typedef struct arguments Arguments;
+
+void parse_arguments(int argc, char *argv[], Arguments *arguments) {
+    char *host;
+    u_int16_t port;
+
+    // parsowanie argumentów adres hosta i port (jeśli zostały podane)
+    if (argc < 3) {
+        host = "localhost";
+        port = htons(8000);
+    } else {
+        host = argv[1];
+        if (port = atoi(argv[2]))
+            port = htons(port);
+        else {
+            perror("Error, not able to parse provided arguments.");
+            exit(1);
+        }
+    }
+
+    struct hostent *host_info;
+    host_info = gethostbyname(host);
+
+    if (host_info == (struct hostent *)0) {
+        fprintf(stderr, "%s: unknown host\n", host);
+        exit(2);
+    }
+
+    printf("Will send to %s:%d\n", host, ntohs(port));
+
+    arguments->host_address = host_info;
+    arguments->port = port;
+}
 
 
 int main(int argc, char *argv[]) {
-
-    printf("PSI zad 2, TCP client\n");
+    int sockfd;
+    struct sockaddr_in server_addr;
+    Arguments arguments;
 
     size_t nodeCount = (int)1e5;
     uint16_t minCharLen = 5, maxCharLen = MAX_STR_LEN;
 
-    node* head = createList(nodeCount, minCharLen, maxCharLen);
+    printf("C client for zadanie 2\n");
+    parse_arguments(argc, argv, &arguments);
 
-    // for (node *trav = head; trav != NULL; trav = trav->next) {
-    //     printElement(trav->elem);
-    // }
+    node* head = createList(nodeCount, minCharLen, maxCharLen);
 
     size_t byteSize;
     char * serialized = serializeList(head, &byteSize);
 
+    // == NETWORKING ==
 
-    int sockfd;
-    struct sockaddr_in server_addr;
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = arguments.port;
+    memcpy((char *)&server_addr.sin_addr, (char*)arguments.host_address->h_addr_list[0], arguments.host_address->h_length);
+    
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
     if (sockfd == -1) {
-        perror("socket creation failed");
+        perror("opening socket");
         exit(EXIT_FAILURE);
     }
 
-
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(SERVER_PORT);
-    server_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); // #TODO: change to normal ip
-
-    if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
-        perror("Invalid address/ Address not supported");
-        close(sockfd);
-        exit(EXIT_FAILURE);
-    }
+    // if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
+    //     perror("Invalid address/ Address not supported");
+    //     close(sockfd);
+    //     exit(EXIT_FAILURE);
+    // }
 
     if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
         perror("Connection to the server failed");
@@ -161,6 +197,8 @@ int main(int argc, char *argv[]) {
 
     if (send(sockfd, serialized, byteSize, 0) < 0) {
         perror("Failed to send data");
+        close(sockfd);
+        exit(EXIT_FAILURE);
     }
     printf("Succesfully sent %ld bytes of data\n", byteSize);
     printf("Sent list with %ld nodes", nodeCount);
