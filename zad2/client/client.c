@@ -1,3 +1,4 @@
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -11,6 +12,9 @@
 #include <string.h>
 #include <memory.h>
 
+// #include "linkedlist.h"
+// -- LINKED LIST --
+
 #define MAX_STR_LEN 50
 #define MAX_ELEM_SIZE 60
 
@@ -22,14 +26,15 @@ typedef struct element {
     char *string;
 } element;
 
-void print_elem(element e) {
-    printf("id:%05d, len:%02d : %s\n", e.id, e.charlen, e.string);
-}
 
 typedef struct node {
     struct element elem;
     struct node* next;
 } node;
+
+void printElement(element e) {
+    printf("id:%05d, len:%02d : %s\n", e.id, e.charlen, e.string);
+}
 
 void generateConsecutiveLetters(char* buffer, uint16_t charlen) {
     for (int i = 0; i < charlen; i++) {
@@ -72,9 +77,7 @@ void deleteList(node* head) {
     }
 }
 
-// serializes linked list to byte array
-// returns allocated array
-char* serializeList(node* head) {
+char* serializeList(node* head, size_t* size) {
 
     size_t bufferSizeStep = 4096;
     size_t bufferSize = bufferSizeStep;
@@ -99,23 +102,68 @@ char* serializeList(node* head) {
         offset += trav->elem.charlen;
     }
 
+    *size = offset;
+
     return buffer;
 }
 
+// -- LINKED LIST -- (end)
+
+#define SERVER_PORT 8000
+#define SERVER_IP "127.0.0.1"
 
 
 int main(int argc, char *argv[]) {
 
     printf("PSI zad 2, TCP client\n");
 
-    node* head = createList((int)1e5, 5, MAX_STR_LEN);
+    size_t listSize = (int)1e2;
+    uint16_t minCharLen = 5, maxCharLen = MAX_STR_LEN;
+
+    node* head = createList(listSize, minCharLen, maxCharLen);
 
     // for (node *trav = head; trav != NULL; trav = trav->next) {
-    //     print_elem(trav->elem);
+    //     printElement(trav->elem);
     // }
 
-    char * serialized = serializeList(head);
-    printf("%100s \n", serialized);
+    size_t byteSize;
+    char * serialized = serializeList(head, &byteSize);
+
+
+    int sockfd;
+    struct sockaddr_in server_addr;
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+
+    if (sockfd == -1) {
+        perror("socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+
+
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(SERVER_PORT);
+    server_addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK); // #TODO: change to normal ip
+
+    if (inet_pton(AF_INET, SERVER_IP, &server_addr.sin_addr) <= 0) {
+        perror("Invalid address/ Address not supported");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+
+    if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+        perror("Connection to the server failed");
+        close(sockfd);
+        exit(EXIT_FAILURE);
+    }
+    printf("Connected to the server.\n");
+
+    if (send(sockfd, serialized, byteSize, 0) < 0) {
+        perror("Failed to send data");
+    }
+    printf("Succesfully sent %ld bytes of data\n", byteSize);
+    close(sockfd);
 
     free(serialized);
     deleteList(head);
