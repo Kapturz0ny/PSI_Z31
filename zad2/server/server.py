@@ -36,7 +36,9 @@ def start_server():
             bstream.seek(0)
             print(f'Received {total_size} bytes of data')
 
-            deserialize(bstream)
+            llist = deserialize(bstream)
+            llist.print()
+            print('Node count: ', llist.size)
 
 
 if __name__ == "__main__":

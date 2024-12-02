@@ -117,10 +117,10 @@ int main(int argc, char *argv[]) {
 
     printf("PSI zad 2, TCP client\n");
 
-    size_t listSize = (int)1e2;
+    size_t nodeCount = (int)1e5;
     uint16_t minCharLen = 5, maxCharLen = MAX_STR_LEN;
 
-    node* head = createList(listSize, minCharLen, maxCharLen);
+    node* head = createList(nodeCount, minCharLen, maxCharLen);
 
     // for (node *trav = head; trav != NULL; trav = trav->next) {
     //     printElement(trav->elem);
@@ -163,6 +163,7 @@ int main(int argc, char *argv[]) {
         perror("Failed to send data");
     }
     printf("Succesfully sent %ld bytes of data\n", byteSize);
+    printf("Sent list with %ld nodes", nodeCount);
     close(sockfd);
 
     free(serialized);
