@@ -113,6 +113,7 @@ void printListLimited(node* head, size_t left, size_t right) {
         if (i <= left || i >= right) {
             printElement(trav->elem);
         }
+        i++;
     }
 }
 
