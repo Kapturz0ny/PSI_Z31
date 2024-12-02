@@ -51,7 +51,7 @@ node* createNode(uint32_t id, uint16_t charlen) {
 
     generateConsecutiveLetters(nn->elem.string, nn->elem.charlen);
     nn->elem.string[nn->elem.charlen] = '\0';
-    
+
     return nn;
 }
 
@@ -87,7 +87,7 @@ char* serializeList(node* head, size_t* size) {
     for (node *trav = head; trav != NULL; trav = trav->next) {
         if (bufferSize < offset + MAX_ELEM_SIZE) {
             bufferSize += bufferSizeStep;
-            buffer = realloc((char*)buffer, bufferSize);
+            buffer = (char*)realloc(buffer, bufferSize);
         }
 
         uint32_t net_id = htonl(trav->elem.id);
@@ -97,7 +97,7 @@ char* serializeList(node* head, size_t* size) {
         uint16_t net_charlen = htons(trav->elem.charlen);
         memcpy(buffer + offset, &net_charlen, sizeof(uint16_t));
         offset += sizeof(uint16_t);
-        
+
         memcpy(buffer + offset, trav->elem.string, trav->elem.charlen);
         offset += trav->elem.charlen;
     }
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = arguments.port;
     memcpy((char *)&server_addr.sin_addr, (char*)arguments.host_address->h_addr_list[0], arguments.host_address->h_length);
-    
+
 
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
 

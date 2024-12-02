@@ -41,21 +41,18 @@ def main():
 
         while True:
             client_socket, client_address = server_socket.accept()
-            print(f"Connected by {client_address}")
-
-            total_size = 0
-            bstream = io.BytesIO()
-            try:
+            with client_socket:
+                print(f"Connected by {client_address}")
+                total_size = 0
+                bstream = io.BytesIO()
                 while True:
                     portion = client_socket.recv(1024)
                     if not portion:
+                        print(f"Closing connection with {client_address}")
                         break
                     bstream.write(portion)
                     total_size += len(portion)
-            except KeyboardInterrupt:
-                print(f"Closing connection with {client_address}")
-                client_socket.close()
-
+            print(f"Closing connection with {client_address}")
             bstream.seek(0)
 
             llist = deserialize(bstream)
