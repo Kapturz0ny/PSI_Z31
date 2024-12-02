@@ -22,7 +22,7 @@ class Element:
             # end of stream
             return None
 
-        string = bstream.read(charlen).__str__()
+        string = bstream.read(charlen).decode('ascii')
 
         return Element(id, charlen, string)
 
