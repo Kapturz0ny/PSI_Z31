@@ -72,26 +72,31 @@ void deleteList(node* head) {
     }
 }
 
+// serializes linked list to byte array
+// returns allocated array
 char* serializeList(node* head) {
+
     size_t bufferSizeStep = 4096;
     size_t bufferSize = bufferSizeStep;
     char* buffer = (char*)malloc(bufferSize);
     size_t offset = 0;
+
     for (node *trav = head; trav != NULL; trav = trav->next) {
         if (bufferSize < offset + MAX_ELEM_SIZE) {
             bufferSize += bufferSizeStep;
             buffer = realloc(buffer, bufferSize);
         }
-        uint32_t id = htonl(trav->elem.id);
-        uint16_t charlen = htons(trav->elem.charlen);
-        char* where = buffer + offset;
-        memcpy(buffer + offset, &id, sizeof(uint32_t));
+
+        uint32_t net_id = htonl(trav->elem.id);
+        memcpy(buffer + offset, &net_id, sizeof(uint32_t));
         offset += sizeof(uint32_t);
-        memcpy(buffer + offset, &charlen, sizeof(uint16_t));
+
+        uint16_t net_charlen = htons(trav->elem.charlen);
+        memcpy(buffer + offset, &net_charlen, sizeof(uint16_t));
         offset += sizeof(uint16_t);
+        
         memcpy(buffer + offset, trav->elem.string, trav->elem.charlen);
         offset += trav->elem.charlen;
-
     }
 
     return buffer;
@@ -100,6 +105,8 @@ char* serializeList(node* head) {
 
 
 int main(int argc, char *argv[]) {
+
+    printf("PSI zad 2, TCP client\n");
 
     node* head = createList((int)1e5, 5, MAX_STR_LEN);
 
