@@ -123,6 +123,7 @@ void printListLimited(node* head, size_t left, size_t right) {
 struct arguments {
     struct hostent *host_address;
     u_int16_t port;
+    size_t nodeCount;
 };
 
 
@@ -144,6 +145,9 @@ void parse_arguments(int argc, char *argv[], Arguments *arguments) {
             perror("Error, not able to parse provided arguments.");
             exit(1);
         }
+    }
+    if (argc >= 4) {
+        arguments->nodeCount = atol(argv[3]);
     }
 
     struct hostent *host_info;
